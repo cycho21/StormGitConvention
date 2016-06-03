@@ -6,6 +6,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 
 import java.util.Map;
 
@@ -26,9 +27,8 @@ public class GitBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         String tempData = tuple.getString(0);
-
-
-
+        _collector.emit(tuple, new Values(tempData + " KILL BYUN RYUN KWAN "));
+        _collector.ack(tuple);
     }
 
     public void parseData(String unparsedString) {
@@ -37,6 +37,6 @@ public class GitBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("language", "repo"));
+        outputFieldsDeclarer.declare(new Fields("repo"));
     }
 }

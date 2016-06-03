@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: kr.ac.uos.ai.Topology
+Main-Class: test.github.GitTopology
 
