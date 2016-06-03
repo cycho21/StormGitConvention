@@ -27,9 +27,9 @@ public class GitTopology {
     private void init() {
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("language", new GitSpout(), 10);
-        builder.setBolt("parse", new GitBolt(), 3).shuffleGrouping("language");
-        builder.setBolt("analysis", new GitAnalysis(), 2).shuffleGrouping("parse");
+        builder.setSpout("language", new GitSpout(), 1);
+        builder.setBolt("parse", new GitBolt(), 4).shuffleGrouping("language");
+        builder.setBolt("analysis", new GitAnalysis(), 4).shuffleGrouping("parse");
 
         Config conf = new Config();
         conf.setDebug(true);

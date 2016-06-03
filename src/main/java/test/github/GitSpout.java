@@ -32,9 +32,11 @@ public class GitSpout extends BaseRichSpout {
     private SpoutOutputCollector _collector;
     private String currentLine;
     private String date;
+    private BufferedReader bufferedReader;
 
 
     public GitSpout() {
+        jsontGet();
     }
 
     @Override
@@ -49,10 +51,7 @@ public class GitSpout extends BaseRichSpout {
 
     @Override
     public void nextTuple() {
-        jsontGet();
-
         System.out.println("nextTuple dir : " + System.getProperty("user.dir"));
-
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader("/root/apache-storm-1.0.1/" + date + "-15.json"));
             while ((currentLine = bufferedReader.readLine()) != null) {
@@ -66,7 +65,7 @@ public class GitSpout extends BaseRichSpout {
     }
 
     private void parse2data(String currentLine) {
-        this._collector.emit(new Values(currentLine.substring(0, 20)));
+        this._collector.emit(new Values(currentLine.substring(0, 18)));
     }
 
 
@@ -85,7 +84,7 @@ public class GitSpout extends BaseRichSpout {
         String urlString = "http://data.githubarchive.org/" + date + "-15.json.gz";
 
         try {
-            File file = new File("/root/apache-storm-1.0.1/" + date + "-15.json.gz");
+            File file = new File(date + "-15.json.gz");
             URL url = new URL(urlString);
             FileUtils.copyURLToFile(url, file);
             gzUnpack();
@@ -103,8 +102,8 @@ public class GitSpout extends BaseRichSpout {
 
         byte[] buffer = new byte[1024];
         try {
-            GZIPInputStream gzis = new GZIPInputStream(new FileInputStream("/root/apache-storm-1.0.1/" + date + "-15.json.gz"));
-            FileOutputStream out = new FileOutputStream("/root/apache-storm-1.0.1/" + date + "-15.json");
+            GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(date + "-15.json.gz"));
+            FileOutputStream out = new FileOutputStream(date + "-15.json");
 
             int len;
 
