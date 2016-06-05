@@ -18,6 +18,7 @@ import java.util.Map;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.zip.GZIPInputStream;
 
 
@@ -33,10 +34,10 @@ public class GitSpout extends BaseRichSpout {
     private String currentLine;
     private String date;
     private BufferedReader bufferedReader;
+    private boolean isFile;
 
 
     public GitSpout() {
-        jsontGet();
     }
 
     @Override
@@ -52,31 +53,40 @@ public class GitSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         System.out.println("nextTuple dir : " + System.getProperty("user.dir"));
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader("/root/apache-storm-1.0.1/" + date + "-15.json"));
-            while ((currentLine = bufferedReader.readLine()) != null) {
-                parse2data(currentLine);
+        if (isFile) {
+            try {
+                if (bufferedReader != null) {
+                    currentLine = bufferedReader.readLine();
+                    parse2data(currentLine);
+                } else {
+                    bufferedReader = new BufferedReader(new FileReader(date + "-15.json"));
+                    currentLine = bufferedReader.readLine();
+                    parse2data(currentLine);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            jsonGet();
         }
     }
 
     private void parse2data(String currentLine) {
-        this._collector.emit(new Values(currentLine.substring(0, 18)));
+
+        this._collector.emit(new Values(currentLine));
     }
 
 
-    public void jsontGet() {
+    public void jsonGet() {
 
         System.out.println("jsonGet dir : " + System.getProperty("user.dir"));
         System.out.println("JSON Getter Started...");
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
+        cal.add(Calendar.DATE, -ThreadLocalRandom.current().nextInt(1, 10 + 1));
         date = dateFormat.format(cal.getTime());
 
         System.out.println(date);
@@ -121,5 +131,6 @@ public class GitSpout extends BaseRichSpout {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        isFile = true;
     }
 }

@@ -27,15 +27,16 @@ public class GitTopology {
     private void init() {
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("language", new GitSpout(), 1);
+        builder.setSpout("language", new GitSpout(), 5);
         builder.setBolt("parse", new GitBolt(), 4).shuffleGrouping("language");
         builder.setBolt("analysis", new GitAnalysis(), 4).shuffleGrouping("parse");
+        builder.setBolt("reduce", new ReduceBolt(), 1).shuffleGrouping("analysis");
 
         Config conf = new Config();
         conf.setDebug(true);
 
         if (args != null && args.length > 0) {
-            conf.setNumWorkers(3);
+            conf.setNumWorkers(4);
 
             try {
                 StormSubmitter.submitTopology(args[0], conf, builder.createTopology());

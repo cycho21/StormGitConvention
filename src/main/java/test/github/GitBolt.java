@@ -27,12 +27,8 @@ public class GitBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         String tempData = tuple.getString(0);
-        _collector.emit(tuple, new Values(tempData + " KILL BYUN RYUN KWAN "));
+        _collector.emit(tuple, new Values(tempData));
         _collector.ack(tuple);
-    }
-
-    public void parseData(String unparsedString) {
-
     }
 
     @Override

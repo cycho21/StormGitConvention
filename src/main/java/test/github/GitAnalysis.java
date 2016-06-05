@@ -23,6 +23,7 @@ public class GitAnalysis extends BaseRichBolt {
     private OutputCollector _collector;
     private JSONObject jsonObject;
     private JSONParser jsonParser;
+    private String tempString;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
@@ -32,9 +33,16 @@ public class GitAnalysis extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        _collector.emit(tuple, new Values(tuple.getString(0) + " FUCK!!! "));
-        _collector.ack(tuple);
+        tempString = null;
+        parse2data(tuple.getString(0));
+
+        if(tempString!=null) {
+            _collector.emit(tuple, new Values(tempString));
+            _collector.ack(tuple);
+        }
+
     }
+
     // payload { pull_request { head { repo
 
     public void parse2data(String unparsedString) {
@@ -52,6 +60,7 @@ public class GitAnalysis extends BaseRichBolt {
                     JSONObject repo = (JSONObject) head.get("repo");
                     if (repo != null) {
                         if(repo.get("language") != null) {
+                            tempString = repo.get("language").toString();
                         }
                     }
                 }
