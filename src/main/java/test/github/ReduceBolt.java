@@ -51,7 +51,6 @@ public class ReduceBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
 
         String language = tuple.getString(0).toString();
-
         if (!file.exists()) {
             try {
                 file.createNewFile();
